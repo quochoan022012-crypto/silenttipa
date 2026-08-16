@@ -2,7 +2,6 @@
 #import "../drawing_view/offset.h"
 #import <Foundation/Foundation.h>
 #import <math.h>
-
 #pragma mark - Function Game
 
 static uint64_t ReadMatchGameFromGameFacadeStatics(uint64_t GameFacade_Static) {
@@ -15,7 +14,6 @@ static uint64_t ReadMatchGameFromGameFacadeStatics(uint64_t GameFacade_Static) {
 uint64_t getMatchGame(uint64_t Moudule_Base) {
     if (!isVaildPtr((uintptr_t)Moudule_Base))
         return 0;
-
     uint64_t typeInfoAddr = Moudule_Base + (uint64_t)kGameFacadeTypeInfo;
     uint64_t GameFacade_TypeInfo = ReadAddr<uint64_t>(typeInfoAddr);
     uint64_t GameFacade_Static = ReadAddr<uint64_t>(GameFacade_TypeInfo + kTypeInfoStatics);
@@ -50,11 +48,11 @@ uint64_t CameraMain(uint64_t matchgame) {
 bool getIsVisible(uint64_t playerPawn) {
     // 🟢 Cải thiện tốc độ check visible
     if (playerPawn == 0) return false;
-    uint64_t AvatarManager = ReadAddr<uint64_t>(playerPawn + _0x27276BC); 
+    uint64_t AvatarManager = ReadAddr<uint64_t>(playerPawn + _0x27276BC);
     if (AvatarManager == 0) return false;
-    uint64_t IUmaAvatar = ReadAddr<uint64_t>(AvatarManager + _0x28726BD); 
+    uint64_t IUmaAvatar = ReadAddr<uint64_t>(AvatarManager + _0x28726BD);
     if (IUmaAvatar == 0) return false;
-    return ReadAddr<bool>(IUmaAvatar + _0x2872DCF); 
+    return ReadAddr<bool>(IUmaAvatar + _0x2872DCF);
 }
 
 static void TipaReadMatrix16(uint64_t addr, float *out) {
@@ -80,11 +78,10 @@ float* GetViewMatrix(uint64_t cameraMain) {
     uint64_t v1 = ReadAddr<uint64_t>(cameraMain + kCameraInner);
     if (!isVaildPtr((uintptr_t)v1))
         return nullptr;
-
     float V[16], P[16];
     TipaReadMatrix16(v1 + kViewMatrixOff, V);
     TipaReadMatrix16(v1 + kProjMatrixOff, P);
-    
+
     static float matrix[16];
     TipaMultiply4x4(P, V, matrix);
     return matrix;
@@ -92,7 +89,6 @@ float* GetViewMatrix(uint64_t cameraMain) {
 
 bool IsAtLobby(uint64_t Moudule_Base) {
     if (!isVaildPtr((uintptr_t)Moudule_Base)) return true;
-
     uint64_t typeInfoAddr = Moudule_Base + (uint64_t)kGameFacadeTypeInfo;
     uint64_t GameFacade_TypeInfo = ReadAddr<uint64_t>(typeInfoAddr);
     if (!isVaildPtr(GameFacade_TypeInfo))
@@ -131,6 +127,13 @@ uint64_t getLeftHand(uint64_t player) { return getBoneTrans(player, kLeftHandNod
 uint64_t getRightShoulder(uint64_t player) { return getBoneTrans(player, kRightShoulderNode); }
 uint64_t getRightElbow(uint64_t player) { return getBoneTrans(player, kRightElbowNode); }
 uint64_t getRightHand(uint64_t player) { return getBoneTrans(player, kRightHandNode); }
+
+bool get_IsFiring(uint64_t player) {
+    if (!isVaildPtr((uintptr_t)player))
+        return false;
+
+    return ReadAddr<bool>(player + kIsFiring);
+}
 
 bool isLocalTeamMate(uint64_t localPlayer, uint64_t Player) {
     if (!isVaildPtr(localPlayer) || !isVaildPtr(Player)) return false;
