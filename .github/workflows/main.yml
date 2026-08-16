@@ -1,3 +1,4 @@
+
 name: Build TIPA
 
 on:
@@ -16,63 +17,77 @@ jobs:
 
     env:
       THEOS: ${{ github.workspace }}/theos
+      CI: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install basic dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git \
-            clang \
-            make \
-            perl \
-            unzip \
-            zip \
-            python3 \
+            bash \
             curl \
-            wget \
-            libplist-utils
+            sudo \
+            git
 
       - name: Install Theos
         run: |
-          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+          rm -rf "$THEOS"
 
-      - name: Bootstrap Theos
-        run: |
-          cd "$THEOS"
-          ./bin/bootstrap
+          export THEOS="${{ github.workspace }}/theos"
 
-      - name: Check Theos
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+
+      - name: Verify Theos
         run: |
           echo "THEOS=$THEOS"
+
+          test -d "$THEOS"
           test -f "$THEOS/makefiles/common.mk"
-          test -x "$THEOS/bin/bootstrap"
-          echo "Theos OK"
+          test -x "$THEOS/toolchain/linux/iphone/bin/clang"
+
+          echo "=============================="
+          echo "Theos installation OK"
+          echo "=============================="
+
+          "$THEOS/toolchain/linux/iphone/bin/clang" --version || true
 
       - name: Check project
         run: |
-          echo "=== Project files ==="
+          echo "=============================="
+          echo "Project files"
+          echo "=============================="
+
           find . -maxdepth 2 -type f | sort
 
-          echo "=== Makefile ==="
+          echo "=============================="
+          echo "Makefile"
+          echo "=============================="
+
           test -f makefile || test -f Makefile
 
-      - name: Build
+      - name: Build TIPA
         run: |
           make clean
           make package FINALPACKAGE=1
 
-      - name: Find TIPA
+      - name: Check TIPA
         run: |
-          echo "=== Output ==="
+          echo "=============================="
+          echo "Build output"
+          echo "=============================="
+
           find . -type f \
             \( -name "*.tipa" -o -name "*.ipa" -o -name "*.deb" \) \
             -print
 
           test -f packages/FFExternal.tipa
+
+          echo "=============================="
+          echo "TIPA BUILD SUCCESS"
+          echo "=============================="
 
       - name: Upload TIPA
         uses: actions/upload-artifact@v4
