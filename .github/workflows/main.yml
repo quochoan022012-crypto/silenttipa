@@ -18,7 +18,7 @@ jobs:
       THEOS: ${{ github.workspace }}/theos
 
     steps:
-      - name: Checkout source
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -31,42 +31,46 @@ jobs:
             perl \
             unzip \
             zip \
-            ldid \
-            libplist-utils \
             python3 \
-            curl
+            curl \
+            wget \
+            libplist-utils
 
       - name: Install Theos
         run: |
           git clone --recursive https://github.com/theos/theos.git "$THEOS"
 
-      - name: Install Theos dependencies
+      - name: Bootstrap Theos
         run: |
           cd "$THEOS"
           ./bin/bootstrap
 
+      - name: Check Theos
+        run: |
+          echo "THEOS=$THEOS"
+          test -f "$THEOS/makefiles/common.mk"
+          test -x "$THEOS/bin/bootstrap"
+          echo "Theos OK"
+
       - name: Check project
         run: |
-          echo "=== Project ==="
-          pwd
-          echo "=== Files ==="
-          find . -maxdepth 2 -type f | sort | head -300
-
-          echo "=== Theos ==="
-          test -f "$THEOS/makefiles/common.mk"
+          echo "=== Project files ==="
+          find . -maxdepth 2 -type f | sort
 
           echo "=== Makefile ==="
           test -f makefile || test -f Makefile
 
-      - name: Build TIPA
+      - name: Build
         run: |
           make clean
           make package FINALPACKAGE=1
 
       - name: Find TIPA
         run: |
-          echo "=== Build output ==="
-          find . -type f \( -name "*.tipa" -o -name "*.ipa" -o -name "*.deb" \) -print
+          echo "=== Output ==="
+          find . -type f \
+            \( -name "*.tipa" -o -name "*.ipa" -o -name "*.deb" \) \
+            -print
 
           test -f packages/FFExternal.tipa
 
