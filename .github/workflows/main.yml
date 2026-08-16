@@ -1,0 +1,78 @@
+name: Build TIPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build FFExternal TIPA
+    runs-on: ubuntu-24.04
+
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            clang \
+            make \
+            perl \
+            unzip \
+            zip \
+            ldid \
+            libplist-utils \
+            python3 \
+            curl
+
+      - name: Install Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git "$THEOS"
+
+      - name: Install Theos dependencies
+        run: |
+          cd "$THEOS"
+          ./bin/bootstrap
+
+      - name: Check project
+        run: |
+          echo "=== Project ==="
+          pwd
+          echo "=== Files ==="
+          find . -maxdepth 2 -type f | sort | head -300
+
+          echo "=== Theos ==="
+          test -f "$THEOS/makefiles/common.mk"
+
+          echo "=== Makefile ==="
+          test -f makefile || test -f Makefile
+
+      - name: Build TIPA
+        run: |
+          make clean
+          make package FINALPACKAGE=1
+
+      - name: Find TIPA
+        run: |
+          echo "=== Build output ==="
+          find . -type f \( -name "*.tipa" -o -name "*.ipa" -o -name "*.deb" \) -print
+
+          test -f packages/FFExternal.tipa
+
+      - name: Upload TIPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFExternal-TIPA
+          path: packages/FFExternal.tipa
+          if-no-files-found: error
