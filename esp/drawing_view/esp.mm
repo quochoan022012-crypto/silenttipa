@@ -168,7 +168,7 @@ BOOL hasSavedOriginalID = false;
 // ─── Frame Cache ──────────────────────────────
 static uint64_t cachedMatchGame  = 0;
 static uint64_t cachedCamera     = 0;
-static uint64_t cachedMatch      = 0;
+uint64_t cachedMatch      = 0;
 static int      cacheRefreshTick = 0;
 
 typedef struct {
