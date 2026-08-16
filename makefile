@@ -31,6 +31,7 @@ $(APPLICATION_NAME)_CFLAGS += -Isources
 $(APPLICATION_NAME)_CFLAGS += -Isources/KIF
 # Thêm đường dẫn include thư mục oxorany để compiler tìm thấy file .h
 $(APPLICATION_NAME)_CFLAGS += -Ioxorany
+$(APPLICATION_NAME)_CFLAGS += -IAPI
 
 $(APPLICATION_NAME)_CFLAGS += -DNOTIFY_DESTROY_HUD="\"vn.vng.freefireth.hud.destroy\""
 $(APPLICATION_NAME)_CFLAGS += -DPID_PATH="@\"/var/mobile/Library/Caches/vn.vng.freefireth.pid\""
@@ -45,7 +46,6 @@ $(APPLICATION_NAME)_RESOURCE_DIRS = ./layout/Resources ./Font
 
 $(APPLICATION_NAME)_LDFLAGS += -Wl,-alias,____isOSVersionAtLeast,___isOSVersionAtLeast
 
-$(APPLICATION_NAME)_LDFLAGS += API/libAPIClient.a
 
 
 include $(THEOS_MAKE_PATH)/application.mk
