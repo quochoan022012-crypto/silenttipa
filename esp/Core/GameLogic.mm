@@ -128,13 +128,6 @@ uint64_t getRightShoulder(uint64_t player) { return getBoneTrans(player, kRightS
 uint64_t getRightElbow(uint64_t player) { return getBoneTrans(player, kRightElbowNode); }
 uint64_t getRightHand(uint64_t player) { return getBoneTrans(player, kRightHandNode); }
 
-bool get_IsFiring(uint64_t player) {
-    if (!isVaildPtr((uintptr_t)player))
-        return false;
-
-    return ReadAddr<bool>(player + kIsFiring);
-}
-
 bool isLocalTeamMate(uint64_t localPlayer, uint64_t Player) {
     if (!isVaildPtr(localPlayer) || !isVaildPtr(Player)) return false;
     COW_GamePlay_PlayerID_o myPlayerID = ReadAddr<COW_GamePlay_PlayerID_o>(localPlayer + kPlayerID);
